@@ -1,5 +1,4 @@
 import numpy as np
-import 
 
 class SheetGroup:
     def __init__(self, columns, rows, table_vals):
@@ -8,20 +7,14 @@ class SheetGroup:
         self.shape = table_vals.shape
 
         self.table_vals = []
-        self.drug_names = []
-        self.cuboids_count = []
-        self.is_background = []
+        self.drug_names = np.full(self.shape, None, dtype=object)
+        self.cuboids_count = np.zeros(self.shape, dtype=int)
+        self.is_background = np.zeros(self.shape, dtype=bool)
 
         self.table_vals.append(table_vals)
-        self.drug_names.append(np.full(self.shape, None, dtype=object))
-        self.cuboids_count.append(np.zeros(self.shape, dtype=int))
-        self.is_background.append(np.zeros(self.shape, dtype=bool))
 
     def add_new_sheet(self, table_vals):
         self.table_vals.append(table_vals)
-        self.drug_names.append(np.full(self.shape, None, dtype=object))
-        self.cuboids_count.append(np.zeros(self.shape, dtype=int))
-        self.is_background.append(np.zeros(self.shape, dtype=bool))
 
     def set_drug_name(self, row, col, drug_name):
         pass

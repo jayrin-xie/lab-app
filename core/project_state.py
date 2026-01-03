@@ -1,5 +1,5 @@
-from tab_table import TabTable
-from utils import load_excel_file
+from sheet_group import SheetGroup
+from utils import load_excel_file, convert_sheet_to_numpy
 
 class ProjectState:
     def __init__(self):
@@ -16,5 +16,3 @@ class ProjectState:
                 self.sheet_groups[sheet_name].add_new_sheet(table_vals)
             else:
                 self.sheet_groups[sheet_name] = SheetGroup(columns, rows, table_vals)
-
-    
