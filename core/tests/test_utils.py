@@ -1,5 +1,6 @@
 import pytest
 import pandas as pd
+import numpy as np
 from pandas.testing import assert_frame_equal
 
 from core.utils import load_excel_file, convert_sheet_to_numpy
@@ -19,7 +20,6 @@ def _single_sheet_expected_dataframe():
 
 
 def _multiple_sheets_expected_dataframes():
-    # First DataFrame
     df1 = pd.DataFrame(
         {
             2: [3092, 2835, 3000],
@@ -27,8 +27,6 @@ def _multiple_sheets_expected_dataframes():
         },
         index=["B", "C", "D"]
     )
-
-    # Second DataFrame
     df2 = pd.DataFrame(
         {
             7: [3415, 4731],
@@ -51,3 +49,15 @@ def test_load_excel_file_multiple_sheets():
     expected_df = _multiple_sheets_expected_dataframes()
     assert_frame_equal(loaded_df["Sheet1"], expected_df[0])
     assert_frame_equal(loaded_df["Sheet2"], expected_df[1])
+
+def test_convert_sheet_to_numpy():
+    dataframe = _single_sheet_expected_dataframe()
+
+    expected_data_array = [] # todo
+    expected_row_labels = []
+    expected_column_labels = []
+
+    data_array, row_labels, col_labels = convert_sheet_to_numpy(dataframe)
+    assert(np.array_equal(data_array, expected_data_array))
+    assert(np.array_equal(row_labels, expected_row_labels))
+    assert(np.array_equal(col_labels, expected_column_labels))

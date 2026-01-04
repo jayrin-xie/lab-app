@@ -1,46 +1,63 @@
 import pandas as pd
 import numpy as np
 
-def find_table_in_sheet(sheet_df):
-    """
-    Find the cell that contains "<>" and return ONLY the table below/right of it.
-    If "<>" is not found, return None.
-    """
-    rows, cols = sheet_df.shape
-
-    anchor_row = None
-    anchor_col = None
-
-    # Search every cell until we find "<>"
-    for i in range(rows):
-        for j in range(cols):
-            value = sheet_df.iat[i, j]
-            if str(value) == "<>":
-                anchor_row = i
-                anchor_col = j
-                break
-        if anchor_row is not None:
-            break
-
-    # If no "<>" was found, no table
-    if anchor_row is None:
+def find_table_in_sheet(sheet_df, anchor="<>"):
+    mask = sheet_df.astype(str).eq(str(anchor))
+    if not mask.any().any():
         return None
 
-    # Crop: table is below and to the right of "<>"
-    table = sheet_df.iloc[anchor_row + 1 :, anchor_col + 1 :]
+    anchor_row, anchor_col = next(zip(*np.where(mask.values)))
 
-    # Remove empty rows at the bottom
-    while len(table) > 0 and table.iloc[-1].isna().all():
-        table = table.iloc[:-1]
+    def is_empty(x):
+        return pd.isna(x) or (isinstance(x, str) and x.strip() == "")
 
-    # Remove empty columns at the right
-    while table.shape[1] > 0 and table.iloc[:, -1].isna().all():
-        table = table.iloc[:, :-1]
+    # Headers (right of anchor, same row)
+    headers = []
+    j = anchor_col + 1
+    while j < sheet_df.shape[1] and not is_empty(sheet_df.iat[anchor_row, j]):
+        headers.append(sheet_df.iat[anchor_row, j])
+        j += 1
 
-    # Reset row index
-    table = table.reset_index(drop=True)
+    # Index labels (below anchor, same column)
+    index = []
+    i = anchor_row + 1
+    while i < sheet_df.shape[0] and not is_empty(sheet_df.iat[i, anchor_col]):
+        index.append(sheet_df.iat[i, anchor_col])
+        i += 1
 
-    return table
+    # Slice body (below-right rectangle)
+    body = sheet_df.iloc[
+        anchor_row + 1 : anchor_row + 1 + len(index),
+        anchor_col + 1 : anchor_col + 1 + len(headers),
+    ].copy()
+
+    # Fix column labels like 7.0 -> 7 (labels only)
+    fixed_headers = []
+    for h in headers:
+        if isinstance(h, (float, np.floating)) and float(h).is_integer():
+            fixed_headers.append(int(h))
+        else:
+            fixed_headers.append(h)
+
+    body.index = index
+    body.columns = fixed_headers
+
+    # coerce data columns to numeric when possible ---
+    for c in body.columns:
+        s = body[c]
+
+        # Try numeric conversion (object -> numbers), but only "accept" it if nothing becomes NaN
+        s_num = pd.to_numeric(s, errors="coerce")
+
+        # If all non-empty entries became numeric, upgrade dtype
+        if s_num.notna().sum() == s.notna().sum():
+            # If all numeric values are integers, cast to int64
+            if (s_num.dropna() % 1 == 0).all():
+                body[c] = s_num.astype("int64")
+            else:
+                body[c] = s_num  # will be float dtype
+
+    return body
 
 
 def load_excel_file(file_path):
@@ -70,7 +87,7 @@ def convert_sheet_to_numpy(sheet_dataframe):
       - data_array: 2D numpy array of values
       - col_labels: numpy array of column labels (0,1,2,... if no headers)
       - row_labels: numpy array of row labels (0,1,2,...)
-    
+
     NOTE: Since we read Excel with header=None, columns are numbers by default.
     """
     data_array = sheet_dataframe.to_numpy()
