@@ -1,5 +1,5 @@
-from sheet_group import SheetGroup
-from utils import load_excel_file, convert_sheet_to_numpy
+from core.sheet_group import SheetGroup
+from core.utils import load_excel_file, convert_sheet_to_numpy
 
 class ProjectState:
     def __init__(self):
@@ -11,7 +11,7 @@ class ProjectState:
       """
       dataframes = load_excel_file(file_path)
       for sheet_name, dataframe in dataframes.items():
-          columns, rows, table_vals = convert_sheet_to_numpy(dataframe)
+          table_vals, rows, columns = convert_sheet_to_numpy(dataframe)
           if sheet_name in self.sheet_groups:
               self.sheet_groups[sheet_name].add_new_sheet(table_vals)
           else:

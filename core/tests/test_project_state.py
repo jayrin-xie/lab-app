@@ -1,12 +1,14 @@
 import pytest
 import numpy as np
 from core.project_state import ProjectState
-from core.tests.test_utils import _single_sheet_expected_dataframe, _multiple_sheets_expected_dataframes
+from core.tests.conftest import (
+    single_sheet_expected_dataframe,
+    multiple_sheets_expected_dataframes,
+    SINGLE_SHEET_PATH,
+    MULTIPLE_SHEETS_PATH,
+)
 
-SINGLE_SHEET_PATH = "core/tests/example_data/single_sheet.xlsx"
-MULTIPLE_SHEETS_PATH = "core/tests/example_data/double_sheet.xlsx"
-
-def test_load_excel_file_single_sheet():
+def test_load_single_excel_file_single_sheet():
     # Create a project state
     project_state = ProjectState()
     
@@ -14,7 +16,7 @@ def test_load_excel_file_single_sheet():
     project_state.load_excel_file(SINGLE_SHEET_PATH)
     
     # Get the expected dataframe and convert to expected numpy arrays
-    expected_df = _single_sheet_expected_dataframe()
+    expected_df = single_sheet_expected_dataframe()
     expected_table_vals = expected_df.to_numpy()
     expected_columns = np.array(expected_df.columns)
     expected_rows = np.array(expected_df.index)
@@ -40,7 +42,7 @@ def test_load_excel_file_double_sheet():
     project_state.load_excel_file(MULTIPLE_SHEETS_PATH)
     
     # Get the expected dataframes and convert to expected numpy arrays
-    expected_df1, expected_df2 = _multiple_sheets_expected_dataframes()
+    expected_df1, expected_df2 = multiple_sheets_expected_dataframes()
     
     # Convert first sheet to numpy arrays
     expected_table_vals1 = expected_df1.to_numpy()
@@ -71,4 +73,46 @@ def test_load_excel_file_double_sheet():
     assert sheet_group2.shape == expected_table_vals2.shape
     assert len(sheet_group2.table_vals) == 1
     assert np.array_equal(sheet_group2.table_vals[0], expected_table_vals2)
+
+def test_load_both_files_combine_sheet1():
+    # Create a project state
+    project_state = ProjectState()
+    
+    # Load the single sheet Excel file first
+    project_state.load_excel_file(SINGLE_SHEET_PATH)
+    
+    # Load the double sheet Excel file (which also contains Sheet1)
+    project_state.load_excel_file(MULTIPLE_SHEETS_PATH)
+    
+    # Get the expected dataframes and convert to expected numpy arrays
+    expected_df_single = single_sheet_expected_dataframe()
+    expected_df1_double, expected_df2_double = multiple_sheets_expected_dataframes()
+    
+    # Convert to numpy arrays
+    expected_table_vals_single = expected_df_single.to_numpy()
+    expected_table_vals1_double = expected_df1_double.to_numpy()
+    expected_table_vals2_double = expected_df2_double.to_numpy()
+    
+    # Check that Sheet1 and Sheet2 exist
+    assert "Sheet1" in project_state.sheet_groups
+    assert "Sheet2" in project_state.sheet_groups
+    
+    # Check Sheet1 - should have 2 table_vals (one from each file)
+    sheet_group1 = project_state.sheet_groups["Sheet1"]
+    assert len(sheet_group1.table_vals) == 2
+    # First table_vals should be from single_sheet.xlsx
+    assert np.array_equal(sheet_group1.table_vals[0], expected_table_vals_single)
+    # Second table_vals should be from double_sheet.xlsx's Sheet1
+    assert np.array_equal(sheet_group1.table_vals[1], expected_table_vals1_double)
+    # Columns and rows should be from the first sheet loaded (single_sheet.xlsx)
+    assert np.array_equal(sheet_group1.columns, np.array(expected_df_single.columns))
+    assert np.array_equal(sheet_group1.rows, np.array(expected_df_single.index))
+    
+    # Check Sheet2 - should have 1 table_vals (only from double_sheet.xlsx)
+    sheet_group2 = project_state.sheet_groups["Sheet2"]
+    assert len(sheet_group2.table_vals) == 1
+    assert np.array_equal(sheet_group2.table_vals[0], expected_table_vals2_double)
+    assert np.array_equal(sheet_group2.columns, np.array(expected_df2_double.columns))
+    assert np.array_equal(sheet_group2.rows, np.array(expected_df2_double.index))
+    
 
