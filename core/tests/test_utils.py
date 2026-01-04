@@ -50,9 +50,11 @@ def test_load_excel_file_multiple_sheets():
 def test_convert_sheet_to_numpy():
     dataframe = _single_sheet_expected_dataframe()
 
-    expected_data_array = [] # todo
-    expected_row_labels = []
-    expected_column_labels = []
+    # to_numpy() returns row-major: 3 rows (B,C,D) x 2 columns (2,3)
+    expected_data_array = np.array([[3098, 2991], [2856, 3910], [2162, 2433]])
+    expected_row_labels = np.array(["B", "C", "D"])
+    # Column labels come from DataFrame.columns which are integers
+    expected_column_labels = np.array([2, 3])
 
     data_array, row_labels, col_labels = convert_sheet_to_numpy(dataframe)
     assert(np.array_equal(data_array, expected_data_array))

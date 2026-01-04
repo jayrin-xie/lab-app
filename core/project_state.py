@@ -18,13 +18,13 @@ class ProjectState:
               self.sheet_groups[sheet_name] = SheetGroup(columns, rows, table_vals)
 
     def set_drug_name(self, sheet, row, col, drug_name):
-      pass
+      self.sheet_groups[sheet].set_drug_name(row, col, drug_name)
 
     def set_cuboid_count(self, sheet, row, col, cuboids_count):
-      pass
+      self.sheet_groups[sheet].set_cuboids_count(row, col, cuboids_count)
 
-    def set_is_background(self, sheet, row, col, cuboids_count):
-      pass
+    def set_is_background(self, sheet, row, col, is_background):
+      self.sheet_groups[sheet].set_is_background(row, col, is_background)
 
     def export_to_excel(self, sheet):
       """

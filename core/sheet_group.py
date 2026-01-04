@@ -20,10 +20,10 @@ class SheetGroup:
         """
         Sets the drug name of a given cell.
         """
-        pass
+        self.drug_names[row, col] = drug_name
 
     def set_cuboids_count(self, row, col, cuboids_count):
-        pass
+        self.cuboids_count[row, col] = cuboids_count
 
     def set_is_background(self, row, col, is_background):
-        pass
+        self.is_background[row, col] = is_background

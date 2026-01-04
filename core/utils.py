@@ -86,16 +86,15 @@ def convert_sheet_to_numpy(sheet_dataframe):
     Converts a pandas dataframe to:
       - data_array: 2D numpy array of values
       - col_labels: numpy array of column labels (0,1,2,... if no headers)
-      - row_labels: numpy array of row labels (0,1,2,...)
+      - row_labels: numpy array of row labels (A,B,C...)
 
-    NOTE: Since we read Excel with header=None, columns are numbers by default.
     """
     data_array = sheet_dataframe.to_numpy()
 
     # Column labels (these will usually be 0,1,2,... unless you set them later)
     col_labels = np.array(sheet_dataframe.columns)
 
-    # Row labels (0,1,2,... after reset_index)
+    # Row labels (A,B,C... after reset_index)
     row_labels = np.array(sheet_dataframe.index)
 
     return data_array, row_labels, col_labels
