@@ -39,9 +39,6 @@ def _multiple_sheets_expected_dataframes():
 def test_load_excel_file_single_sheet():
     loaded_df = load_excel_file(SINGLE_SHEET_PATH)
     expected_df = _single_sheet_expected_dataframe()
-    print(expected_df)
-    print()
-    print(loaded_df["Sheet1"])
     assert_frame_equal(loaded_df["Sheet1"], expected_df)
 
 def test_load_excel_file_multiple_sheets():

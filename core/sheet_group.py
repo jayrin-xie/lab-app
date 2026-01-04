@@ -17,6 +17,9 @@ class SheetGroup:
         self.table_vals.append(table_vals)
 
     def set_drug_name(self, row, col, drug_name):
+        """
+        Sets the drug name of a given cell.
+        """
         pass
 
     def set_cuboids_count(self, row, col, cuboids_count):
