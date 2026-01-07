@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import os
 from core.project_state import ProjectState
 from core.tests.conftest import (
     single_sheet_expected_dataframe,
@@ -31,8 +32,10 @@ def test_load_single_excel_file_single_sheet():
     assert sheet_group.shape == expected_table_vals.shape
     
     # Check table_vals
+    filename = os.path.basename(SINGLE_SHEET_PATH)
     assert len(sheet_group.table_vals) == 1
-    assert np.array_equal(sheet_group.table_vals[0], expected_table_vals)
+    assert filename in sheet_group.table_vals
+    assert np.array_equal(sheet_group.table_vals[filename], expected_table_vals)
 
 def test_load_excel_file_double_sheet():
     # Create a project state
@@ -59,12 +62,14 @@ def test_load_excel_file_double_sheet():
     assert "Sheet2" in project_state.sheet_groups
     
     # Check Sheet1
+    filename = os.path.basename(MULTIPLE_SHEETS_PATH)
     sheet_group1 = project_state.sheet_groups["Sheet1"]
     assert np.array_equal(sheet_group1.columns, expected_columns1)
     assert np.array_equal(sheet_group1.rows, expected_rows1)
     assert sheet_group1.shape == expected_table_vals1.shape
     assert len(sheet_group1.table_vals) == 1
-    assert np.array_equal(sheet_group1.table_vals[0], expected_table_vals1)
+    assert filename in sheet_group1.table_vals
+    assert np.array_equal(sheet_group1.table_vals[filename], expected_table_vals1)
     
     # Check Sheet2
     sheet_group2 = project_state.sheet_groups["Sheet2"]
@@ -72,7 +77,8 @@ def test_load_excel_file_double_sheet():
     assert np.array_equal(sheet_group2.rows, expected_rows2)
     assert sheet_group2.shape == expected_table_vals2.shape
     assert len(sheet_group2.table_vals) == 1
-    assert np.array_equal(sheet_group2.table_vals[0], expected_table_vals2)
+    assert filename in sheet_group2.table_vals
+    assert np.array_equal(sheet_group2.table_vals[filename], expected_table_vals2)
 
 def test_load_both_files_combine_sheet1():
     # Create a project state
@@ -98,12 +104,16 @@ def test_load_both_files_combine_sheet1():
     assert "Sheet2" in project_state.sheet_groups
     
     # Check Sheet1 - should have 2 table_vals (one from each file)
+    single_filename = os.path.basename(SINGLE_SHEET_PATH)
+    double_filename = os.path.basename(MULTIPLE_SHEETS_PATH)
     sheet_group1 = project_state.sheet_groups["Sheet1"]
     assert len(sheet_group1.table_vals) == 2
     # First table_vals should be from single_sheet.xlsx
-    assert np.array_equal(sheet_group1.table_vals[0], expected_table_vals_single)
+    assert single_filename in sheet_group1.table_vals
+    assert np.array_equal(sheet_group1.table_vals[single_filename], expected_table_vals_single)
     # Second table_vals should be from double_sheet.xlsx's Sheet1
-    assert np.array_equal(sheet_group1.table_vals[1], expected_table_vals1_double)
+    assert double_filename in sheet_group1.table_vals
+    assert np.array_equal(sheet_group1.table_vals[double_filename], expected_table_vals1_double)
     # Columns and rows should be from the first sheet loaded (single_sheet.xlsx)
     assert np.array_equal(sheet_group1.columns, np.array(expected_df_single.columns))
     assert np.array_equal(sheet_group1.rows, np.array(expected_df_single.index))
@@ -111,7 +121,8 @@ def test_load_both_files_combine_sheet1():
     # Check Sheet2 - should have 1 table_vals (only from double_sheet.xlsx)
     sheet_group2 = project_state.sheet_groups["Sheet2"]
     assert len(sheet_group2.table_vals) == 1
-    assert np.array_equal(sheet_group2.table_vals[0], expected_table_vals2_double)
+    assert double_filename in sheet_group2.table_vals
+    assert np.array_equal(sheet_group2.table_vals[double_filename], expected_table_vals2_double)
     assert np.array_equal(sheet_group2.columns, np.array(expected_df2_double.columns))
     assert np.array_equal(sheet_group2.rows, np.array(expected_df2_double.index))
     

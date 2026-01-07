@@ -1,3 +1,4 @@
+import os
 from core.sheet_group import SheetGroup
 from core.utils import load_excel_file, convert_sheet_to_numpy
 
@@ -9,13 +10,14 @@ class ProjectState:
       """
       Loads an excel file and adds sheets to corresponding sheet groups.
       """
+      filename = os.path.basename(file_path)
       dataframes = load_excel_file(file_path)
       for sheet_name, dataframe in dataframes.items():
           table_vals, rows, columns = convert_sheet_to_numpy(dataframe)
           if sheet_name in self.sheet_groups:
-              self.sheet_groups[sheet_name].add_new_sheet(table_vals)
+              self.sheet_groups[sheet_name].add_new_sheet(filename, table_vals)
           else:
-              self.sheet_groups[sheet_name] = SheetGroup(columns, rows, table_vals)
+              self.sheet_groups[sheet_name] = SheetGroup(columns, rows, filename, table_vals)
 
     def set_drug_name(self, sheet, row, col, drug_name):
       self.sheet_groups[sheet].set_drug_name(row, col, drug_name)
