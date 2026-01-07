@@ -27,3 +27,6 @@ class SheetGroup:
 
     def set_is_background(self, row, col, is_background):
         self.is_background[row, col] = is_background
+
+    def get_file_names(self):
+      return self.table_vals.keys()

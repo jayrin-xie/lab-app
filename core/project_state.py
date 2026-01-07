@@ -1,4 +1,5 @@
 import os
+from core import sheet_group
 from core.sheet_group import SheetGroup
 from core.utils import load_excel_file, convert_sheet_to_numpy
 
@@ -33,3 +34,10 @@ class ProjectState:
       Todo: write an in depth overview on how this works
       """
       pass
+
+    def get_sheet_group_names(self):
+        return self.sheet_group.keys()
+
+    def get_all_files_from_same_sheet_group(self, sheet_name):
+        return self.sheet_groups[sheet_name].get_file_names()
+    
