@@ -30,3 +30,6 @@ class SheetGroup:
 
     def get_file_names(self):
       return self.table_vals.keys()
+
+    def get_unique_drug_names(self):
+        return np.unique(self.drug_names)
