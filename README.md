@@ -1,11 +1,16 @@
 # lab-app
+# utils
+- find all <> in a excel sheet
+- extract multiple tables per sheet
+- Returns clean pandas DataFrames
 
-Run tests with the following command:
-pytest core/tests/<test_file_name>.py
-(first you may need to install pytest. to do this "conda install pytest")
+- load_excel_file: Iterates through all sheets, mode="first" → one table per sheet, mode="all" → list of tables per sheet
+- Works once pass a correct file path
 
-Todo list:
-  - Optional, install "cursor" and set up student account. This is like ai enabled vscode, you can ask the agent questions about the code.
-  - complete test_convert_sheet_to_numpy method in test_utils.py. You will need to fill in the expected data, row, and column np arrays.
-  - 
+# project state
+- hold loaded tables, loads an excel file and adds sheets to corresponding sheet groups (one table per sheet or multiple tables per sheet)
+- load work book has problem, it requires all table to have same shape
+- manage current file / sheet / plate
+- apply processing steps (subtract, ratio, mask)
+- expose clean data to the GUI
 
